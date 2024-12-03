@@ -56,11 +56,48 @@ def percent_to_graph(percent: float, length: int=20) -> str:
 
 def get_sys_mem() -> int:
     "return total system memory (used or available) in kB"
-    ...
+
+#Finding the system memory
+    file = open('/proc/meminfo', 'r')
+
+    for data_line in file:
+
+        if "MemTotal" in data_line:
+            total_mem_kb = int(data_line.split()[1])
+            file.close()
+            return total_mem_kb
+
+        file.close()
+
 
 def get_avail_mem() -> int:
     "return total memory that is available"
-    ...
+
+#Finding the system memory
+    file = open('/proc/meminfo', 'r')
+    mem_free = 0
+    swap_free = 0
+    mem_available = False
+
+    for data_line in file:
+
+        if "MemFree" in data_line:
+            mem_free = int(data_line.split()[1]) #For MemFree
+
+        elif "SwapFree" in data_line:
+            swap_free = int(data_line.split()[1]) #For SwapFree
+
+        elif "MemAvailable" in data_line:
+            mem_available = int(data_line.split()[1]) #For MemAvailable
+
+#MemFree + SwapFree (for WSL)
+    file.close()
+
+    if mem_available == False:
+        return mem_free + swap_free
+
+    return mem_available
+
 
 def pids_of_prog(app_name: str) -> list:
     "given an app name, return all pids associated with app"
