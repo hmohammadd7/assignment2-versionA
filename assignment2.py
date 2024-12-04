@@ -116,7 +116,28 @@ def pids_of_prog(app_name: str) -> list:
 
 def rss_mem_of_pid(proc_id: str) -> int:
     "given a process id, return the resident memory used, zero if not found"
-    ...
+
+#Finding the status file
+    status_line = f"/proc/{proc_id}/status"
+
+    try:
+
+#Opening the status file
+        file = open(status_line, 'r')
+
+#To see if the lines in the file is available
+        for line in file:
+            if line[0:5] == "VmRSS":  # First 5 characters
+                file.close()
+                return int(line.split()[1]) #Return resident memory
+
+        file.close()
+
+    except (FileNotFoundError, PermissionError):
+        return 0
+
+    return 0
+
 
 def bytes_to_human_r(kibibytes: int, decimal_places: int=2) -> str:
     "turn 1,024 into 1 MiB, for example"
